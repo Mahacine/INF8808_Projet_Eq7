@@ -334,63 +334,63 @@ def main():
     # Visualization 7
     # Q11: Combien de participations un athlète dans ma discipline a-t-il généralement avant de remporter une médaille ?
     # ===========================
-        # Visualization: Number of Medals Over Time
-        df = olympics_data[olympics_data["Gender"] == user_sex]
+    # Visualization: Number of Medals Over Time
+    df = olympics_data[olympics_data["Gender"] == user_sex]
 
-        if discipline != "None":
-            df = olympics_data[olympics_data["Sport"] == discipline].copy()
-        else :
-            df = olympics_data[olympics_data["Sport"] == "Ice Hockey"].copy()
+    if discipline != "None":
+        df = olympics_data[olympics_data["Sport"] == discipline].copy()
+    else :
+        df = olympics_data[olympics_data["Sport"] == "Ice Hockey"].copy()
 
-        if user_country: 
-            df = df[df["NOC"].isin(["CAN", "USA", user_country])]
-        else:
-            df = df[df["NOC"].isin(["CAN", "USA"])]
+    if user_country: 
+        df = df[df["NOC"].isin(["CAN", "USA", user_country])]
+    else:
+        df = df[df["NOC"].isin(["CAN", "USA"])]
 
-        # Filter for user sex
-        
-        
-        df = df.drop_duplicates(subset=["Name", "Year"])
-        df = df.sort_values(["Name", "Year"])
-        df["Participation_Number"] = df.groupby("Name").cumcount() + 1
-        df["Participation_Number"] = df["Participation_Number"].apply(lambda x: str(x) if x <= 3 else "4+")
-        df["Medal_Status"] = df["Medal"].apply(lambda x: "Medal Won" if pd.notna(x) else "No Medal")
+    # Filter for user sex
     
-        participation_counts = df.groupby(["Team", "Participation_Number", "Medal_Status"]).size().unstack(fill_value=0)
-        odds_by_part = participation_counts.iloc[:, 0].div(participation_counts.sum(axis=1), axis=0) * 100
-        odds_by_part = odds_by_part.reset_index(name="Odds")
-        team_indices = {team: idx for idx, team in enumerate(odds_by_part["Team"].unique())}
-        odds_by_part["y"] = odds_by_part["Team"].map(team_indices)
-        num_teams = len(team_indices)
-        fig_height = 400 + num_teams * 50  # Base height of 400 plus 50 per team
-        
-        fig = px.scatter(
-            odds_by_part,
-            x="Participation_Number",
-            y="y",  # Use y values based on team index
-            size="Odds",
-            color="Team",
-            text=odds_by_part["Odds"].round(2).astype(str) + '%',  # Add percentage labels
-            labels={"Participation_Number": "Number of Olympic Participations", "Odds": "Odds of Winning a Medal (1/x)"},
-            opacity=0.85,
-            size_max=75,
-            height=fig_height  # Set the height of the figure
-        )
-        
-        fig.update_layout(
-            font=dict(size=14),
-            xaxis=dict(
-                showline=False,
-                showgrid=False,
-                tickmode="array",
-                tickvals=["1", "2", "3", "4+"],
-                ticktext=["1", "2", "3", "4+"]
-            ),
-            yaxis=dict(visible=False),  # Hide the y-axis
-            showlegend=True  # Show the legend
-        )
-        st.subheader("Visualisation 7: Odds of Winning a Medal Based on Number of Olympic Participations" + (f" in {discipline}" if discipline != "None" else " in Ice Hockey")+ (f" for {user_sex}")) 
-        st.plotly_chart(fig)
+    
+    df = df.drop_duplicates(subset=["Name", "Year"])
+    df = df.sort_values(["Name", "Year"])
+    df["Participation_Number"] = df.groupby("Name").cumcount() + 1
+    df["Participation_Number"] = df["Participation_Number"].apply(lambda x: str(x) if x <= 3 else "4+")
+    df["Medal_Status"] = df["Medal"].apply(lambda x: "Medal Won" if pd.notna(x) else "No Medal")
+
+    participation_counts = df.groupby(["Team", "Participation_Number", "Medal_Status"]).size().unstack(fill_value=0)
+    odds_by_part = participation_counts.iloc[:, 0].div(participation_counts.sum(axis=1), axis=0) * 100
+    odds_by_part = odds_by_part.reset_index(name="Odds")
+    team_indices = {team: idx for idx, team in enumerate(odds_by_part["Team"].unique())}
+    odds_by_part["y"] = odds_by_part["Team"].map(team_indices)
+    num_teams = len(team_indices)
+    fig_height = 400 + num_teams * 50  # Base height of 400 plus 50 per team
+    
+    fig = px.scatter(
+        odds_by_part,
+        x="Participation_Number",
+        y="y",  # Use y values based on team index
+        size="Odds",
+        color="Team",
+        text=odds_by_part["Odds"].round(2).astype(str) + '%',  # Add percentage labels
+        labels={"Participation_Number": "Number of Olympic Participations", "Odds": "Odds of Winning a Medal (1/x)"},
+        opacity=0.85,
+        size_max=75,
+        height=fig_height  # Set the height of the figure
+    )
+    
+    fig.update_layout(
+        font=dict(size=14),
+        xaxis=dict(
+            showline=False,
+            showgrid=False,
+            tickmode="array",
+            tickvals=["1", "2", "3", "4+"],
+            ticktext=["1", "2", "3", "4+"]
+        ),
+        yaxis=dict(visible=False),  # Hide the y-axis
+        showlegend=True  # Show the legend
+    )
+    st.subheader("Visualisation 7: Odds of Winning a Medal Based on Number of Olympic Participations" + (f" in {discipline}" if discipline != "None" else " in Ice Hockey")+ (f" for {user_sex}")) 
+    st.plotly_chart(fig)
 
     # ===========================
     # Visualization 8

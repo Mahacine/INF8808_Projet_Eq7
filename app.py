@@ -334,7 +334,6 @@ def main():
     # Visualization 7
     # Q11: Combien de participations un athlète dans ma discipline a-t-il généralement avant de remporter une médaille ?
     # ===========================
-    if discipline != "None":
         # Visualization: Number of Medals Over Time
         df = olympics_data[olympics_data["Gender"] == user_sex]
 
@@ -392,8 +391,6 @@ def main():
         )
         st.subheader("Visualisation 7: Odds of Winning a Medal Based on Number of Olympic Participations" + (f" in {discipline}" if discipline != "None" else " in Ice Hockey")+ (f" for {user_sex}")) 
         st.plotly_chart(fig)
-    else:
-        st.info("Please select a discipline to view medal participation analysis.")
 
     # ===========================
     # Visualization 8

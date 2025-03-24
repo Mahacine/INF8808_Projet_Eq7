@@ -54,6 +54,8 @@ def main():
     if user_age is not None:
         filtered_data = filtered_data[filtered_data["Age"] == user_age]
 
+
+    # Header
     st.title("Welcome to our Olympics Data Exploration and Visualization App")
     st.write(f"You have selected {user_sex} athletes from "
              f"{user_country if user_country != 'None' else 'all countries'} in "

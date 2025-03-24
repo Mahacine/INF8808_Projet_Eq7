@@ -19,20 +19,34 @@ def main():
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
     discipline = st.sidebar.selectbox("Select a discipline", ["None"] + olympics_data["Sport"].unique().tolist())
     user_country = st.sidebar.selectbox("Select your country", ["None"] + olympics_data["NOC"].unique().tolist())
+    user_age = st.sidebar.text_input("Enter your age (0-99)")
+
+    # Validate age input
+    if user_age:
+        if user_age.isdigit():
+            user_age = int(user_age)
+            if user_age < 0 or user_age > 99:
+                st.sidebar.error("Age must be between 0 and 99.")
+                return
+        else:
+            st.sidebar.error("Please enter a valid age.")
+            return
+    else:
+        user_age = None
 
     # Filter data based on user inputs
-    if discipline != "None" and user_country != "None":
-        filtered_data = olympics_data[(olympics_data["Sport"] == discipline) & (olympics_data["Gender"] == user_sex) & (olympics_data["NOC"] == user_country)]
-    elif discipline != "None":
-        filtered_data = olympics_data[(olympics_data["Sport"] == discipline) & (olympics_data["Gender"] == user_sex)]
-    elif user_country != "None":
-        filtered_data = olympics_data[(olympics_data["Gender"] == user_sex) & (olympics_data["NOC"] == user_country)]
-    else:
-        filtered_data = olympics_data[olympics_data["Gender"] == user_sex]
+    filtered_data = olympics_data[olympics_data["Gender"] == user_sex]
+    if user_age is not None:
+        filtered_data = filtered_data[filtered_data["Age"] == user_age]
+    if discipline != "None":
+        filtered_data = filtered_data[filtered_data["Sport"] == discipline]
+    if user_country != "None":
+        filtered_data = filtered_data[filtered_data["NOC"] == user_country]
 
     # Display user inputs
     st.write(f"Hello {user_name}!")
-    st.write(f"You have selected {user_sex} athletes from {user_country if user_country != 'None' else 'all countries'} in {discipline if discipline != 'None' else 'all disciplines'}.")
+    age_text = f"aged {user_age}" if user_age is not None else "of all ages"
+    st.write(f"You have selected {user_sex} athletes {age_text} from {user_country if user_country != 'None' else 'all countries'} in {discipline if discipline != 'None' else 'all disciplines'}.")
 
     # Data visualization
     st.title("Olympics Data Exploration and Visualization")

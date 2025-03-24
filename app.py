@@ -11,7 +11,7 @@ olympics_data = pd.read_csv('all_athlete_games.csv')
 def main():
 
     # Sidebar
-    st.sidebar.image("header_image.png", width=120)
+    st.sidebar.image("header_image.png", width=200)
     st.sidebar.title("Please provide the following details : ")
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
     discipline = st.sidebar.selectbox("Select a discipline", ["None"] + olympics_data["Sport"].unique().tolist())
@@ -19,8 +19,7 @@ def main():
     st.sidebar.markdown("---")
     st.sidebar.markdown("Developed by Team 7 : ")
     st.sidebar.code("Rima Al Zawahra 2023119\nIman Bouara 1990495\nAlexis Desforges 2146454\nMahacine Ettahri 2312965 \nNeda Khoshnoudi 2252125\nNicolas Lopez 2143179")
-    st.sidebar.markdown("[GitHub Repository](https://github.com/Mahacine/INF8808_Projet_Eq7)")
-
+    st.sidebar.markdown("[![GitHub](https://img.icons8.com/ios-glyphs/30/000000/github.png)](https://github.com/Mahacine/INF8808_Projet_Eq7)")
 
     # Filter data based on user inputs
     if discipline != "None" and user_country != "None":
@@ -51,7 +50,6 @@ def main():
                      y="Age Group",
                      size="Count",
                      color="Age Group",
-                     title="Age Distribution of Athletes Over Time",
                      labels={"Year": "Year", "Age Group": "Age Group", "Count": "Number of Athletes"},
                      opacity=0.85,
                      size_max=40)
@@ -65,7 +63,6 @@ def main():
     fig = px.line(athletes_over_time,
                   x="Year",
                   y="Count",
-                  title="Number of Athletes Over Time",
                   labels={"Year": "Year", "Count": "Number of Athletes"})
     st.plotly_chart(fig)
 

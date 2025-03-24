@@ -16,11 +16,27 @@ def main():
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
     discipline = st.sidebar.selectbox("Select a discipline", ["None"] + olympics_data["Sport"].unique().tolist())
     user_country = st.sidebar.selectbox("Select your country", ["None"] + olympics_data["NOC"].unique().tolist())
+    user_age = st.sidebar.text_input("Enter your age (0-99)")
     st.sidebar.markdown("---")
     st.sidebar.markdown("Developed by Team 7 : ")
     st.sidebar.code("Rima Al Zawahra 2023119\nIman Bouara 1990495\nAlexis Desforges 2146454\nMahacine Ettahri 2312965 \nNeda Khoshnoudi 2252125\nNicolas Lopez 2143179")
     st.sidebar.markdown("[GitHub Repository](https://github.com/Mahacine/INF8808_Projet_Eq7)")
 
+
+    
+
+    # Validate age input
+    if user_age:
+        if user_age.isdigit():
+            user_age = int(user_age)
+            if user_age < 0 or user_age > 99:
+                st.sidebar.error("Age must be between 0 and 99.")
+                return
+        else:
+            st.sidebar.error("Please enter a valid age.")
+            return
+    else:
+        user_age = None
 
     # Filter data based on user inputs
     if discipline != "None" and user_country != "None":
@@ -31,6 +47,9 @@ def main():
         filtered_data = olympics_data[(olympics_data["Gender"] == user_sex) & (olympics_data["NOC"] == user_country)]
     else:
         filtered_data = olympics_data[olympics_data["Gender"] == user_sex]
+
+    if user_age is not None:
+        filtered_data = filtered_data[filtered_data["Age"] == user_age]
 
 
     # Data visualization

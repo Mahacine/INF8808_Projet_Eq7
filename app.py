@@ -5,14 +5,35 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+import preprocess
+
+def prep_data(olympics_dataframe, regions_dataframe):
+    '''
+        Imports the .csv file and does some preprocessing.
+
+        Returns:
+            A pandas dataframe containing the preprocessed data.
+    '''
+    
+    olympics_dataframe = preprocess.convert_age(olympics_dataframe)
+    olympics_dataframe = preprocess.normalize_events(olympics_dataframe)
+    olympics_dataframe = preprocess.normalize_countries(olympics_dataframe, regions_dataframe)
+
+    return None
+
 # Load the data
-olympics_data = pd.read_csv('all_athlete_games.csv')
+olympics_data = pd.read_csv('./assets/data/all_athlete_games.csv')
+regions_data = pd.read_csv('./assets/data/all_regions.csv')
+
+header_image_path = './assets/images/header_image.png'
+
+data = prep_data(olympics_data, regions_data)
 
 def main():
     # ---------------------------
     # Sidebar: User Inputs
     # ---------------------------
-    st.sidebar.image("header_image.png", width=200)
+    st.sidebar.image(header_image_path, width=200)
     st.sidebar.title("Please provide the following details : ")
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
     discipline = st.sidebar.selectbox("Select a discipline", ["None"] + olympics_data["Sport"].unique().tolist())

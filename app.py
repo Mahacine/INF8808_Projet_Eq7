@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 import preprocess
+import scatter_charts
+from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
 def prep_data(olympics_dataframe, regions_dataframe):
     '''
@@ -18,7 +19,7 @@ def prep_data(olympics_dataframe, regions_dataframe):
     olympics_dataframe = preprocess.convert_age(olympics_dataframe)
     olympics_dataframe = preprocess.normalize_events(olympics_dataframe)
     olympics_dataframe = preprocess.normalize_countries(olympics_dataframe, regions_dataframe)
-
+    
     return None
 
 # Load the data
@@ -75,18 +76,11 @@ def main():
     if user_age is not None:
         filtered_data = filtered_data[filtered_data["Age"] == user_age]
 
-
     # Header
     st.title("Welcome to our Olympics Data Exploration and Visualization App")
     st.write(f"You have selected {user_sex} athletes from "
              f"{user_country if user_country != 'None' else 'all countries'} in "
              f"{discipline if discipline != 'None' else 'all disciplines'}.")
-
-    # Define age bins, labels, and midpoints (used in several visualizations)
-    age_bins = [10, 14, 17, 20, 23, 26, 30, 35, 100]
-    age_labels = ["10-14", "15-17", "18-20", "21-23", "24-26", "27-30", "31-35", "36+"]
-    age_midpoints = {"10-14": 12, "15-17": 16, "18-20": 19, "21-23": 22, 
-                     "24-26": 25, "27-30": 28, "31-35": 33, "36+": 40}
 
     # ===========================
     # Visualization 1
@@ -99,69 +93,17 @@ def main():
     show_avg = st.checkbox("Show Average Age", key="show_avg_age")
 
     # Prepare data for visualization 1
-    data_plot = filtered_data.copy().dropna(subset=["Age"])
-    data_plot["Age Group"] = pd.cut(data_plot["Age"], bins=age_bins, labels=age_labels, right=False)
-    data_plot["Age_Midpoint"] = data_plot["Age Group"].map(age_midpoints)
-    grouped = data_plot.groupby(["Year", "Age Group"]).size().reset_index(name="Count")
-    grouped["Age_Midpoint"] = grouped["Age Group"].map(age_midpoints)
-
-    if mode == "Relative":
-        total_per_year = grouped.groupby("Year")["Count"].transform("sum")
-        grouped["Percentage"] = (grouped["Count"] / total_per_year) * 100
-        size_column = "Percentage"
+    data_plot = preprocess.add_age_group(filtered_data)
+    if data_plot.empty:
+        st.info("No data available for the selected filters and age.")
     else:
-        size_column = "Count"
+        grouped = data_plot.groupby(["Year", "Age Group"]).size().reset_index(name="Count")
+        grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
 
-    if show_avg:
-        fig1 = make_subplots(specs=[[{"secondary_y": True}]])
-    else:
-        fig1 = go.Figure()
+        grouped, size_column = preprocess.compute_relative_size_column(grouped, mode)
 
-    fig1.add_trace(
-        go.Scatter(
-            x=grouped["Year"],
-            y=grouped["Age_Midpoint"],
-            mode="markers",
-            marker=dict(
-                size=grouped[size_column],
-                sizemode="area",
-                sizeref=2.*max(grouped[size_column])/(40.**2),
-                sizemin=4,
-                color=grouped["Age_Midpoint"],
-                colorscale="Viridis",
-                showscale=True,
-            ),
-            text=grouped["Age Group"].astype(str) + "<br>" + size_column + ": " + grouped[size_column].round(1).astype(str),
-            hovertemplate="Year: %{x}<br>Age Group: %{text}<extra></extra>",
-        ),
-        secondary_y=False if show_avg else None
-    )
-
-    if show_avg:
-        avg_age = data_plot.groupby("Year")["Age"].mean().reset_index(name="Average Age")
-        fig1.add_trace(
-            go.Scatter(
-                x=avg_age["Year"],
-                y=avg_age["Average Age"],
-                mode="lines+markers",
-                name="Average Age",
-                line=dict(color="red"),
-            ),
-            secondary_y=True
-        )
-        fig1.update_yaxes(title_text="Age Group (Midpoint)", secondary_y=False,
-                          tickvals=list(age_midpoints.values()), ticktext=list(age_midpoints.keys()))
-        fig1.update_yaxes(title_text="Average Age", secondary_y=True)
-    else:
-        fig1.update_yaxes(title_text="Age Group (Midpoint)",
-                          tickvals=list(age_midpoints.values()), ticktext=list(age_midpoints.keys()))
-
-    fig1.update_layout(
-        title="Evolution of Age Distribution and Average Age Over Time",
-        xaxis_title="Year",
-        legend_title="Legend"
-    )
-    st.plotly_chart(fig1)
+        fig1 = scatter_charts.create_age_distribution_bubble(data_plot, grouped, size_column, show_avg, mode)
+        st.plotly_chart(fig1)
 
     # ===========================
     # Visualization 2
@@ -171,33 +113,20 @@ def main():
     if discipline != "None":
         events = filtered_data["Event"].unique().tolist()
         event_selected = st.selectbox("Select a sub-category (Event)", ["All"] + events, key="event_select")
+        
+        data_event = filtered_data.copy()
         if event_selected != "All":
-            data_event = filtered_data[filtered_data["Event"] == event_selected].copy()
+            data_event = data_event[data_event["Event"] == event_selected]
+        
+        if data_event.empty:
+            st.info("No event data available for the selected filters and age.")
         else:
-            data_event = filtered_data.copy()
-        data_event = data_event.dropna(subset=["Age"])
-        data_event["Age Group"] = pd.cut(data_event["Age"], bins=age_bins, labels=age_labels, right=False)
-        data_event["Age_Midpoint"] = data_event["Age Group"].map(age_midpoints)
-        grouped_event = data_event.groupby(["Year", "Age Group"]).size().reset_index(name="Count")
-        grouped_event["Age_Midpoint"] = grouped_event["Age Group"].map(age_midpoints)
-        mode_event = st.radio("Select mode (Event)", ("Absolute", "Relative"), key="mode_event")
-        if mode_event == "Relative":
-            total_event = grouped_event.groupby("Year")["Count"].transform("sum")
-            grouped_event["Percentage"] = (grouped_event["Count"] / total_event) * 100
-            size_col_event = "Percentage"
-        else:
-            size_col_event = "Count"
-        fig2 = px.scatter(grouped_event,
-                          x="Year",
-                          y="Age_Midpoint",
-                          size=size_col_event,
-                          color="Age Group",
-                          labels={"Year": "Year", "Age Group": "Age Group", size_col_event: "Count/Percentage"},
-                          opacity=0.85,
-                          size_max=40)
-        fig2.update_yaxes(tickvals=list(age_midpoints.values()), ticktext=list(age_midpoints.keys()),
-                          title="Age Group (Midpoint)")
-        st.plotly_chart(fig2)
+            grouped_event = preprocess.group_by_year_and_age_group(data_event)
+            mode_event = st.radio("Select mode (Event)", ("Absolute", "Relative"), key="mode_event")
+            grouped_event, size_col_event = preprocess.compute_relative_size_column(grouped_event, mode_event)
+            fig2 = scatter_charts.create_event_age_scatter(grouped_event, size_col_event)
+            st.plotly_chart(fig2)
+
     else:
         st.info("Please select a discipline to view sub-category analysis.")
 
@@ -208,10 +137,11 @@ def main():
     st.subheader("Visualisation 3: Existe-t-il une tranche d'âge optimale pour remporter une médaille dans ma discipline ?")
     if discipline != "None":
         data_medal = filtered_data[filtered_data["Medal"] != "No medal"].copy()
+
         if not data_medal.empty:
-            data_medal["Age Group"] = pd.cut(data_medal["Age"], bins=age_bins, labels=age_labels, right=False)
+            data_medal["Age Group"] = pd.cut(data_medal["Age"], bins=AGE_BINS, labels=AGE_LABELS, right=False)
             medal_group = data_medal.groupby(["Medal", "Age Group"]).size().reset_index(name="Count")
-            medal_group["Age_Midpoint"] = medal_group["Age Group"].map(age_midpoints)
+            medal_group["Age_Midpoint"] = medal_group["Age Group"].map(AGE_MIDPOINTS)
             fig3 = px.scatter(medal_group,
                               x="Medal",
                               y="Age_Midpoint",
@@ -220,7 +150,7 @@ def main():
                               labels={"Medal": "Medal Type", "Age_Midpoint": "Age Group (Midpoint)", "Count": "Number of Medalists"},
                               size_max=40,
                               opacity=0.8)
-            fig3.update_yaxes(tickvals=list(age_midpoints.values()), ticktext=list(age_midpoints.keys()),
+            fig3.update_yaxes(tickvals=list(AGE_MIDPOINTS.values()), ticktext=list(AGE_MIDPOINTS.keys()),
                               title="Age Group")
             st.plotly_chart(fig3)
         else:

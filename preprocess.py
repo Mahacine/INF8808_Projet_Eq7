@@ -87,3 +87,74 @@ def compute_relative_size_column(df, mode, value_col="Count", group_col="Year"):
         return df, "Percentage"
     else:
         return df, value_col
+
+def preprocess_sankey_data(olympics_data, year, sport, country, top_k=3):
+    '''
+        Computes data to display in the participation sankey diagram
+
+        args:
+            olympics_data: The dataframe 
+            year: The participation year
+            sport: The selected discipline
+            country: The participating country
+            top_k: 
+        returns:
+            The constructed Sankey diagram
+    '''
+    
+    # If the selected year is "All Editions", include all years
+    if year == "All Editions":
+        df_medals = olympics_data[(olympics_data["Sport"] == sport)]
+    else:
+        df_medals = olympics_data[(olympics_data["Sport"] == sport) & (olympics_data["Year"] == year)]
+
+    # Count the number of medals for each country
+    df_medals_with_medals = df_medals[df_medals['Medal'].notna()]
+    total_medal_counts = df_medals_with_medals['NOC'].value_counts()
+    # Select the 'country' and the top k countries
+    top_countries = total_medal_counts.head(top_k).index.tolist()
+    if country not in top_countries:
+        top_countries.append(country)
+
+    # Keep only the previous countries
+    df_medals = df_medals[df_medals['NOC'].isin(top_countries)]
+
+    # Create No Medal label for NaN values
+    df_medals['Medal'] = df_medals['Medal'].fillna('No Medal')
+
+    # Create a column to differiente each country and their medals
+    # This will be used to map each country to its own nodes in the sankey diagram
+    df_medals['Medal_NOC'] = df_medals['Medal'] + '_' + df_medals['NOC']
+
+    # Count the number of medals for each country, for each type of medals
+    medal_counts = df_medals.groupby(['NOC', 'Medal_NOC']).size().reset_index(name='Count')
+
+    total_counts_per_country = df_medals.groupby('NOC').size()  # Total participations per country
+    medal_counts['Percentage'] = medal_counts.apply(lambda row: (row['Count'] / total_counts_per_country[row['NOC']]) * 100, axis=1)  # Normalize to percentage
+
+    # Sort countries
+    total_counts_sorted = medal_counts.groupby('NOC')['Count'].sum().sort_values(ascending=False)
+    sorted_countries = total_counts_sorted.index.tolist()
+
+    medal_counts['NOC'] = pd.Categorical(medal_counts['NOC'], categories=sorted_countries, ordered=True)
+    medal_counts = medal_counts.sort_values('NOC')
+
+    return df_medals, medal_counts
+
+def group_by_medal_and_age_group(df):
+    '''
+        Groups the dataframe by year and age group, and counts the number of medals in each group.
+
+        args:
+            df: The dataframe containing "Age" and "Medal" columns
+        returns:
+            A grouped dataframe with medal counts
+    '''
+    df = df.copy()
+    df = df.dropna(subset=["Age"])
+    df["Age Group"] = pd.cut(df["Age"], bins=AGE_BINS, labels=AGE_LABELS, right=False)
+    df["Age_Midpoint"] = df["Age Group"].map(AGE_MIDPOINTS)
+    grouped = df.groupby(["Medal", "Age Group"]).size().reset_index(name="Count")
+    grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
+    
+    return grouped

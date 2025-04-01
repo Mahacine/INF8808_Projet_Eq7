@@ -6,6 +6,8 @@ import plotly.graph_objects as go
 
 import preprocess
 import scatter_charts
+import sankey_diagrams
+import bubble_chart
 from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
 def prep_data(olympics_dataframe, regions_dataframe):
@@ -20,15 +22,15 @@ def prep_data(olympics_dataframe, regions_dataframe):
     olympics_dataframe = preprocess.normalize_events(olympics_dataframe)
     olympics_dataframe = preprocess.normalize_countries(olympics_dataframe, regions_dataframe)
     
-    return None
+    return olympics_dataframe
 
 # Load the data
-olympics_data = pd.read_csv('./assets/data/all_athlete_games.csv')
+olympics_data_unprocessed = pd.read_csv('./assets/data/all_athlete_games.csv')
 regions_data = pd.read_csv('./assets/data/all_regions.csv')
 
 header_image_path = './assets/images/header_image.png'
 
-data = prep_data(olympics_data, regions_data)
+olympics_data = prep_data(olympics_data_unprocessed, regions_data)
 
 def main():
     # ---------------------------
@@ -136,25 +138,12 @@ def main():
     # ===========================
     st.subheader("Visualisation 3: Existe-t-il une tranche d'âge optimale pour remporter une médaille dans ma discipline ?")
     if discipline != "None":
-        data_medal = filtered_data[filtered_data["Medal"] != "No medal"].copy()
-
-        if not data_medal.empty:
-            data_medal["Age Group"] = pd.cut(data_medal["Age"], bins=AGE_BINS, labels=AGE_LABELS, right=False)
-            medal_group = data_medal.groupby(["Medal", "Age Group"]).size().reset_index(name="Count")
-            medal_group["Age_Midpoint"] = medal_group["Age Group"].map(AGE_MIDPOINTS)
-            fig3 = px.scatter(medal_group,
-                              x="Medal",
-                              y="Age_Midpoint",
-                              size="Count",
-                              color="Age Group",
-                              labels={"Medal": "Medal Type", "Age_Midpoint": "Age Group (Midpoint)", "Count": "Number of Medalists"},
-                              size_max=40,
-                              opacity=0.8)
-            fig3.update_yaxes(tickvals=list(AGE_MIDPOINTS.values()), ticktext=list(AGE_MIDPOINTS.keys()),
-                              title="Age Group")
-            st.plotly_chart(fig3)
+        medal_by_age_distribution = preprocess.group_by_medal_and_age_group(olympics_data[olympics_data["Sport"] == discipline])
+        if medal_by_age_distribution.empty:
+            st.info("No medal data available for the selected sport.")
         else:
-            st.info("No medal data available for the selected filters.")
+            fig3 = bubble_chart.create_medal_age_bubble(medal_by_age_distribution)
+            st.plotly_chart(fig3)
     else:
         st.info("Please select a discipline to view medal analysis.")
 
@@ -163,60 +152,25 @@ def main():
     # Q5, Q6 & Q7: Analyse de la performance et de la participation par pays via un diagramme Sankey
     # ===========================
     st.subheader("Visualisation 4: Comment mon pays a-t-il performé historiquement et comparativement aux pays de référence ?")
-    if user_country != "None":
-        if discipline != "None":
-            data_country = olympics_data[(olympics_data["Sport"] == discipline) & (olympics_data["Gender"] == user_sex)].copy()
+    if user_country != "None" and discipline != "None":
+        participation_year = st.selectbox("Select a year", ["All Editions"] + olympics_data["Year"].unique().tolist())
+        performance_mode_event = st.radio("Select a mode", ("Absolute", "Relative"), key="performance_mode_event")
+        if performance_mode_event == "Absolute":
+            is_relative = False
         else:
-            data_country = olympics_data[olympics_data["Gender"] == user_sex].copy()
-        country_medals = data_country.groupby(["NOC", "Medal"]).size().reset_index(name="Count")
-        country_counts = data_country.groupby("NOC").size().reset_index(name="Total")
-        country_perf = pd.merge(country_medals, country_counts, on="NOC")
-        top_countries = country_counts.sort_values("Total", ascending=False)["NOC"].unique()[:3].tolist()
-        if user_country not in top_countries:
-            selected_countries = top_countries + [user_country]
-        else:
-            selected_countries = top_countries
-        sankey_data = country_perf[country_perf["NOC"].isin(selected_countries)]
-        medal_categories = ["No medal", "Gold", "Silver", "Bronze"]
-        node_labels = list(selected_countries) + medal_categories
-        node_dict = {label: idx for idx, label in enumerate(node_labels)}
-        sankey_links = sankey_data[sankey_data["Medal"].isin(medal_categories)]
-        sources = sankey_links["NOC"].map(node_dict).tolist()
-        targets = sankey_links["Medal"].map(lambda x: node_dict[x]).tolist()
-        values = sankey_links["Count"].tolist()
-        node_colors = []
-        for label in node_labels:
-            if label == user_country:
-                node_colors.append("red")
-            elif label in selected_countries:
-                node_colors.append("blue")
-            elif label == "Gold":
-                node_colors.append("gold")
-            elif label == "Silver":
-                node_colors.append("silver")
-            elif label == "Bronze":
-                node_colors.append("brown")
-            else:
-                node_colors.append("gray")
-        fig4 = go.Figure(data=[go.Sankey(
-            node = dict(
-                pad = 15,
-                thickness = 20,
-                line = dict(color = "black", width = 0.5),
-                label = node_labels,
-                color = node_colors
-            ),
-            link = dict(
-                source = sources,
-                target = targets,
-                value = values,
-                hovertemplate="Source: %{source.label}<br>Target: %{target.label}<br>Value: %{value}<extra></extra>"
-            )
-        )])
-        fig4.update_layout(title_text="Country Participation and Medal Distribution", font_size=10)
+            is_relative = True
+        # Add a static legend using Markdown/HTML
+        st.markdown("""
+        **Medal Type**  
+        🏅 **Gold**  
+        🥈 **Silver**  
+        🥉 **Bronze**  
+        ⚪ **No Medal**
+        """, unsafe_allow_html=True)
+        fig4 = sankey_diagrams.create_sankey_plot(olympics_data, participation_year, discipline, user_country, is_relative)
         st.plotly_chart(fig4)
     else:
-        st.info("Please select a country to view performance analysis.")
+        st.info("Please select a country and a discipline to view performance analysis.")
 
     # ===========================
     # Visualization 5

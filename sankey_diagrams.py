@@ -2,6 +2,7 @@ from preprocess import preprocess_sankey_data
 import plotly.graph_objects as go
 
 from theme import GOLD, SILVER, BRONZE, NO_MEDAL
+import hover_template
 
 # Function to create the Sankey plot for a given year or for all editions
 def create_sankey_plot(olympics_data, year, sport, country, is_relative = False):
@@ -100,13 +101,16 @@ def create_sankey_plot(olympics_data, year, sport, country, is_relative = False)
             x=x_values,
             y=y_values,
             label=countries,
-            color=node_colors
-
+            color=node_colors,
+            customdata=countries + [country for country in countries for _ in range(4)],
+            hovertemplate=hover_template.source_sankey_hover(is_relative)
         ),
         link=dict(
             source=source_indices,
             target=target_indices,
-            value=values
+            value=values,
+            customdata=[(label.split('_')[0], label.split('_')[1]) for label in all_labels if label not in countries],
+            hovertemplate=hover_template.performance_sankey_hover(is_relative)
         )
     ))
 

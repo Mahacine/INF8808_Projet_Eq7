@@ -98,8 +98,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
             pad=15,
             thickness=20,
             line=dict(color='black', width=0.5),
-            x=x_values,
-            y=y_values,
+            # x=x_values,
+            # y=y_values,
             label=countries,
             color=node_colors,
             customdata=countries + [country for country in countries for _ in range(4)],
@@ -120,7 +120,7 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
     else :
       plot_type = 'Percentage'
     fig.update_layout(
-        title_text=f'Medal distribution in ({sport}) : ({year}) ({plot_type})',
+        title_text=f'Medal distribution in {sport} by {plot_type} (Edition : {year})',
         font_size=12
     )
 

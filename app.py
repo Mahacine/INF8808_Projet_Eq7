@@ -153,13 +153,13 @@ def main():
     # ===========================
     st.subheader("Visualisation 4: Comment mon pays a-t-il performé historiquement et comparativement aux pays de référence ?")
     if user_country != "None" and discipline != "None":
-        participation_year = st.selectbox("Select a year", ["All Editions"] + olympics_data["Year"].unique().tolist())
+        participation_year = st.selectbox("Select a year", ["All Editions"] + sorted([year for year in olympics_data["Year"].unique() if year >= 1999], reverse=True))
         performance_mode_event = st.radio("Select a mode", ("Absolute", "Relative"), key="performance_mode_event")
         if performance_mode_event == "Absolute":
             is_relative = False
         else:
             is_relative = True
-        # Add a static legend using Markdown/HTML
+        # Add a legend
         st.markdown("""
         **Medal Type**  
         🏅 **Gold**  

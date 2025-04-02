@@ -14,7 +14,7 @@ def connected_dot_plot(event_counts, discipline):
         color="Gender",
         title=f"Number of Men's and Women's Participations in {discipline}",
         labels={"Clean_Event": "Event", "Count": "Number of Events"},
-        color_discrete_map={"Men's": "blue", "Women's": "pink"},
+        color_discrete_map={"Men": "blue", "Women": "pink"},
         symbol="Gender"
     )
 

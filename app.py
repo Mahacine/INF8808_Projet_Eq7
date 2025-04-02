@@ -168,7 +168,10 @@ def main():
         ⚪ **No Medal**
         """, unsafe_allow_html=True)
         fig4 = sankey_diagrams.create_sankey_plot(olympics_data, participation_year, discipline, user_country, is_relative)
-        st.plotly_chart(fig4)
+        if fig4 is None:
+            st.info("No data available for the selected filters.")
+        else:
+            st.plotly_chart(fig4)
     else:
         st.info("Please select a country and a discipline to view performance analysis.")
 

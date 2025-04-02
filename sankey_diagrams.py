@@ -8,6 +8,9 @@ import hover_template
 def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative = False):
 
     df_medals, medal_counts = preprocess_sankey_data(olympics_data, year, sport, selected_country)
+    
+    if df_medals is None:
+      return None
 
     # List of nodes for Sankey
     countries = medal_counts['NOC'].unique().tolist()
@@ -98,8 +101,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
             pad=15,
             thickness=20,
             line=dict(color='black', width=0.5),
-            # x=x_values,
-            # y=y_values,
+            x=x_values,
+            y=y_values,
             label=countries,
             color=node_colors,
             customdata=countries + [country for country in countries for _ in range(4)],

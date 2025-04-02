@@ -130,6 +130,12 @@ def preprocess_sankey_data(olympics_data, year, sport, country, top_k=3):
     medal_counts = df_medals.groupby(['NOC', 'Medal_NOC']).size().reset_index(name='Count')
 
     total_counts_per_country = df_medals.groupby('NOC').size()  # Total participations per country
+    print(total_counts_per_country)
+    if total_counts_per_country.empty:
+        return None, None
+    
+    # print(year)
+    # print(medal_counts.apply(lambda row: (row['Count'] / total_counts_per_country[row['NOC']]) * 100, axis=1))
     medal_counts['Percentage'] = medal_counts.apply(lambda row: (row['Count'] / total_counts_per_country[row['NOC']]) * 100, axis=1)  # Normalize to percentage
 
     # Sort countries

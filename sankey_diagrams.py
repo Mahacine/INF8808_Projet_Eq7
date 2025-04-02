@@ -5,9 +5,9 @@ from theme import GOLD, SILVER, BRONZE, NO_MEDAL
 import hover_template
 
 # Function to create the Sankey plot for a given year or for all editions
-def create_sankey_plot(olympics_data, year, sport, country, is_relative = False):
+def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative = False):
 
-    df_medals, medal_counts = preprocess_sankey_data(olympics_data, year, sport, country)
+    df_medals, medal_counts = preprocess_sankey_data(olympics_data, year, sport, selected_country)
 
     # List of nodes for Sankey
     countries = medal_counts['NOC'].unique().tolist()
@@ -56,8 +56,6 @@ def create_sankey_plot(olympics_data, year, sport, country, is_relative = False)
             target_indices.append(all_labels.index(no_medal_NOC))
             values.append(no_medal_count)
 
-    node_colors = []
-
     medal_colors = {
         'Gold': GOLD, 
         'Silver': SILVER,
@@ -66,8 +64,10 @@ def create_sankey_plot(olympics_data, year, sport, country, is_relative = False)
     }
 
     # Add countries' colors
-    for label in countries:
-        node_colors.append('red' if label == country else 'black')
+    node_colors = ['black'] * len(countries)
+    for idx, label in enumerate(countries):
+      if label == selected_country:
+          node_colors[idx] = 'red'
 
     # Add medals' colors
     for label in all_labels:

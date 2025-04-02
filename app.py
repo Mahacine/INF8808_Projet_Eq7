@@ -8,6 +8,7 @@ import preprocess
 import scatter_charts
 import sankey_diagrams
 import bubble_chart
+import connected_dot_plot
 from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
 def prep_data(olympics_dataframe, regions_dataframe):
@@ -180,43 +181,18 @@ def main():
     # Q8: Pour ma discipline, existe-t-il des disparités entre hommes et femmes ?
     # ===========================
     st.subheader("Visualisation 5: Pour ma discipline, existe-t-il des disparités entre hommes et femmes ?")
+
     if discipline != "None":
-        gender_data = olympics_data[(olympics_data["Sport"] == discipline)].copy()
-        gender_counts = gender_data.groupby(["Event", "Gender"]).size().reset_index(name="Count")
-        gender_pivot = gender_counts.pivot(index="Event", columns="Gender", values="Count").dropna().reset_index()
-        gender_pivot = gender_pivot.sort_values("Male", ascending=False)
-        fig5 = go.Figure()
-        fig5.add_trace(go.Scatter(
-            x=gender_pivot["Male"],
-            y=gender_pivot["Event"],
-            mode="markers",
-            marker=dict(color="blue", size=10),
-            name="Male"
-        ))
-        fig5.add_trace(go.Scatter(
-            x=gender_pivot["Female"],
-            y=gender_pivot["Event"],
-            mode="markers",
-            marker=dict(color="pink", size=10),
-            name="Female"
-        ))
-        for i, row in gender_pivot.iterrows():
-            fig5.add_trace(go.Scatter(
-                x=[row["Male"], row["Female"]],
-                y=[row["Event"], row["Event"]],
-                mode="lines",
-                line=dict(color="gray"),
-                showlegend=False
-            ))
-        fig5.update_layout(
-            xaxis_title="Number of Participants",
-            yaxis_title="Event",
-            title="Gender Disparities in Participation for " + discipline,
-            height=600
-        )
-        st.plotly_chart(fig5)
+            event_counts = preprocess.dot_plot_preprocess(olympics_data, discipline)
+
+            if "Men's" not in event_counts.columns or "Women's" not in event_counts.columns:
+                st.error("There is no available data for selected discipline.")
+            else:
+                fig5 = connected_dot_plot.connected_dot_plot(event_counts, discipline)
+                st.plotly_chart(fig5, use_container_width=True)
     else:
         st.info("Please select a discipline to view gender disparities.")
+
 
     # ===========================
     # Visualization 6

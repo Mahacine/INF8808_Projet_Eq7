@@ -164,3 +164,17 @@ def group_by_medal_and_age_group(df):
     grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
     
     return grouped
+
+
+def dot_plot_preprocess(olympics_data, discipline):
+    sport_events = olympics_data[olympics_data["Sport"] == discipline]["Event"]
+    df = pd.DataFrame(sport_events, columns=['Event'])
+
+    # Cleaning and categorizing the data
+    df['Clean_Event'] = df['Event'].str.replace(r"Men's |Women's |Mixed ", '', regex=True)
+    df['Gender'] = df['Event'].str.extract(r"(Men's|Women's)")
+
+    # Creating a pivot table to count events by gender
+    event_counts = df.pivot_table(index='Clean_Event', columns='Gender', aggfunc='size', fill_value=0).reset_index()
+    
+    return event_counts

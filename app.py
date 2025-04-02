@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 import preprocess
+import sport
 import scatter_charts
 import sankey_diagrams
 import bubble_chart
@@ -40,7 +41,7 @@ def main():
     st.sidebar.image(header_image_path, width=200)
     st.sidebar.title("Please provide the following details : ")
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
-    discipline = st.sidebar.selectbox("Select a discipline", ["None"] + olympics_data["Sport"].unique().tolist())
+    discipline = st.sidebar.selectbox("Select a discipline", ["None"] + [sport.value for sport in sport.Sport])
     user_country = st.sidebar.selectbox("Select your country", ["None"] + olympics_data["NOC"].unique().tolist())
     user_age = st.sidebar.text_input("Enter your age (0-99)")
     st.sidebar.markdown("---")

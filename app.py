@@ -10,6 +10,7 @@ import scatter_charts
 import sankey_diagrams
 import bubble_chart
 import connected_dot_plot
+import stacked_bar_chart
 from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
 def prep_data(olympics_dataframe, regions_dataframe):
@@ -200,20 +201,15 @@ def main():
     # Q9 & Q10: Évolution de la répartition hommes-femmes et participation féminine dans le temps
     # ===========================
     st.subheader("Visualisation 6: Evolution of Gender Participation Over Time")
+
     if discipline != "None":
-        data_gender = olympics_data[(olympics_data["Sport"] == discipline) & 
-                                    (olympics_data["Gender"].isin(["Male", "Female"]))].copy()
+
+        processed_data = preprocess.preprocess_data(olympics_data, discipline)    
+        fig6 = stacked_bar_chart.visualize_data(processed_data)
+        st.plotly_chart(fig6)
+
     else:
-        data_gender = olympics_data[olympics_data["Gender"].isin(["Male", "Female"])].copy()
-    gender_year = data_gender.groupby(["Year", "Gender"]).size().reset_index(name="Count")
-    year_totals = gender_year.groupby("Year")["Count"].transform("sum")
-    gender_year["Percentage"] = (gender_year["Count"] / year_totals) * 100
-    fig6 = px.bar(gender_year, x="Year", y="Percentage", color="Gender", barmode="stack",
-                  labels={"Percentage": "Percentage of Participants", "Year": "Year"},
-                  title="Gender Participation Over Time",
-                  color_discrete_map={"Male": "blue", "Female": "pink"})
-    fig6.add_hline(y=50, line_dash="dash", line_color="black")
-    st.plotly_chart(fig6)
+        st.info("Please select a discipline to view gender disparities.")
 
     # ===========================
     # Visualization 7

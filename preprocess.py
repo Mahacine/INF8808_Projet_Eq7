@@ -178,3 +178,17 @@ def dot_plot_preprocess(olympics_data, discipline):
     event_counts = df.pivot_table(index='Clean_Event', columns='Gender', aggfunc='size', fill_value=0).reset_index()
     
     return event_counts
+
+def preprocess_data(data, sport):
+    athletics_data = data[data["Sport"] == sport]
+    gender_counts = athletics_data.groupby(["Year", "Gender"]).size().reset_index(name="Count")
+
+    pivot_df = gender_counts.pivot(index="Year", columns="Gender", values="Count").fillna(0)
+    pivot_df["Total"] = pivot_df.sum(axis=1)
+    pivot_df["Female %"] = (pivot_df["Female"] / pivot_df["Total"]) * 100
+    pivot_df["Male %"] = (pivot_df["Male"] / pivot_df["Total"]) * 100
+
+    pivot_df = pivot_df.reset_index()
+    pivot_df["Year"] = pivot_df["Year"].astype(str)
+    
+    return pivot_df

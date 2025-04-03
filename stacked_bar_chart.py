@@ -32,14 +32,15 @@
 import plotly.express as px
 
 
-def visualize_data(data):
+def visualize_data(data, sport):
     fig = px.bar(
         data,
         x="Year",
         y=["Female %", "Male %"],
         labels={"value": "Percentage of Athletes", "Year": "Olympic Year"},
-        title="Evolution of Male and Female Participation in Olympic Athletics",
+        title=f"Evolution of Male and Female Participation in {sport}",
         color_discrete_map={"Female %": "pink", "Male %": "blue"}
+        symbol="Gender percentage"
     )
 
     fig.update_layout(
@@ -50,7 +51,7 @@ def visualize_data(data):
             tickvals=data["Year"],
             ticktext=data["Year"],
         ),
-        yaxis=dict(title="% Share of Athletes"),
+        yaxis=dict(title="percentage of participation"),
         plot_bgcolor="white"
     )
 

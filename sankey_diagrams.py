@@ -42,7 +42,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
               count = medal_counts[(medal_counts['Medal_NOC'] == medal_NOC)]['Percentage'].sum()
               medal_values[medal] = count
 
-            if count > 0: 
+            # if count > 0: 
+            if True:
                 source_indices.append(all_labels.index(country))
                 target_indices.append(all_labels.index(medal_NOC))
                 values.append(count)
@@ -53,7 +54,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
           no_medal_count = 100 - sum(medal_values.values())
 
         # Add the link for 'No Medal'
-        if no_medal_count > 0:
+        # if no_medal_count > 0:
+        if True:
             no_medal_NOC = f'No Medal_{country}'
             source_indices.append(all_labels.index(country))
             target_indices.append(all_labels.index(no_medal_NOC))
@@ -92,7 +94,12 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
       y_values = [0, 0, 0, 0, 0.05, 0.20, 0.35, 0.5, 0.6, 0.75, 0.9, 1.10, 1.15, 1.30, 1.45, 1.9, 2, 2.15, 2.3, 2.6]
       x_values = [0, 1, 2, 3, 0.35, 0.35, 0.35, 0.35, 0.351, 0.351, 0.351, 0.351, 0.352, 0.352, 0.352, 0.352, 0.353, 0.353, 0.353, 0.353]
 
-
+    link_colors = []
+    for idx,color in enumerate(node_colors[len(countries):]):
+       # if values[idx] != 0:
+       rgb = tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+       link_colors.append(f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, 0.7)")
+    
     # Sankey Diagram
     fig = go.Figure(go.Sankey(
         orientation = 'v',
@@ -101,8 +108,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
             pad=15,
             thickness=20,
             line=dict(color='black', width=0.5),
-            x=x_values,
-            y=y_values,
+            # x=x_values,
+            # y=y_values,
             label=countries,
             color=node_colors,
             customdata=countries + [country for country in countries for _ in range(4)],
@@ -112,6 +119,8 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
             source=source_indices,
             target=target_indices,
             value=values,
+            color=link_colors,
+            line=dict(color="grey", width=0.3),
             customdata=[(label.split('_')[0], label.split('_')[1]) for label in all_labels if label not in countries],
             hovertemplate=hover_template.performance_sankey_hover(is_relative)
         )

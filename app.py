@@ -164,12 +164,12 @@ def main():
             is_relative = True
         # Add a legend
         st.markdown("""
-        **Medal Type**  
-        🏅 **Gold**  
-        🥈 **Silver**  
-        🥉 **Bronze**  
-        ⚪ **No Medal**
-        """, unsafe_allow_html=True)
+        **Medal Type**<br>
+        <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:gold;border:1px solid black;"></span> Gold<br>
+        <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:silver;border:1px solid black;"></span> Silver<br>
+        <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:#CD7F32;border:1px solid black;"></span> Bronze<br>
+        <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:white;border:1px solid black;"></span> No Medal
+         """, unsafe_allow_html=True)
         fig4 = sankey_diagrams.create_sankey_plot(olympics_data, participation_year, discipline, user_country, is_relative)
         if fig4 is None:
             st.info("No data available for the selected filters.")

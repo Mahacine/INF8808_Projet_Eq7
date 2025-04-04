@@ -232,25 +232,14 @@ def main():
     # Q12: Combien de fois pourrais-je participer aux Jeux Olympiques tout au long de ma carrière ?
     # ===========================
     st.subheader("Visualisation 8: Career Participation Span Across Sports")
-    career_data = olympics_data.groupby("Sport")["Age"].agg(Min_Age="min", Max_Age="max").reset_index()
-    fig8 = go.Figure()
-    for i, row in career_data.iterrows():
-        color = "red" if (discipline != "None" and row["Sport"] == discipline) else "blue"
-        fig8.add_trace(go.Scatter(
-            x=[row["Sport"], row["Sport"]],
-            y=[row["Min_Age"], row["Max_Age"]],
-            mode="lines+markers",
-            line=dict(dash="dot", color=color),
-            marker=dict(size=10, color=color),
-            showlegend=False
-        ))
-    fig8.update_layout(
-        xaxis_title="Sport",
-        yaxis_title="Age",
-        title="Career Participation Span by Sport",
-        xaxis_tickangle=-45
-    )
-    st.plotly_chart(fig8)
+    
+    if discipline != "None":
+        age_stats, age_stats_long = preprocess.preprocess_connected_dot_plot_data(olympics_data, discipline)    
+        fig8 = connected_dot_plot.connected_dot_plot_8(age_stats, age_stats_long, discipline)
+        st.plotly_chart(fig8)
+
+    else:
+        st.info("Please select a discipline to view participation span.")
 
 if __name__ == "__main__":
     main()

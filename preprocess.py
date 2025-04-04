@@ -224,3 +224,35 @@ def preprocess_bar_chart_data(olympics_data, sport):
     df = sport_selected_medals[sport_selected_medals['Participation_Number'] <= 4] 
     
     return df
+
+def preprocess_connected_dot_plot_data(olympics_data, sport):
+    df = olympics_data
+    
+    df['Career Length'] = df.groupby('Name')['Year'].transform('nunique')
+
+    # avg_career_length = df.groupby('Sport')['Career Length'].mean().reset_index()
+
+    # avg_career_length = avg_career_length.sort_values('Career Length', ascending=False)
+
+    # avg_career_length['Color'] = avg_career_length['Sport'].apply(lambda x: 'red' if x == 'Swimming' else 'gray')
+
+    # min_career_length = df.groupby('Sport')['Career Length'].min().reset_index()
+
+    # max_career_length = df.groupby('Sport')['Career Length'].max().reset_index()
+    
+    min_age = df.groupby('Sport')['Age'].min().reset_index()
+    max_age = df.groupby('Sport')['Age'].max().reset_index()
+
+    age_stats = pd.merge(min_age, max_age, on='Sport', suffixes=('_min', '_max'))
+
+    age_stats['Color'] = age_stats['Sport'].apply(lambda x: 'red' if x == sport else 'gray')
+
+
+    age_stats_long = pd.melt(
+        age_stats,
+        id_vars=['Sport', 'Color'],
+        value_vars=['Age_min', 'Age_max'],
+        var_name='Age',
+        value_name='Age (Years)'
+    )
+    return age_stats, age_stats_long   

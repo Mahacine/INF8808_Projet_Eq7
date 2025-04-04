@@ -192,3 +192,35 @@ def preprocess_data(data, sport):
     pivot_df["Year"] = pivot_df["Year"].astype(str)
     
     return pivot_df
+
+def preprocess_bar_chart_data(olympics_data, sport):
+    '''
+        Computes data to display in the 
+
+        args:
+            olympics_data: The dataframe 
+            sport: The selected discipline
+        returns:
+            Data for the Visualisation 7 bar chart
+    '''
+    df = olympics_data[olympics_data["Sport"] == sport].sort_values(["Name", "Year"])
+
+    df["Participation_Number"] = df.groupby("Name").cumcount() + 1 
+    df["Medal_Status"] = df["Medal"].apply(lambda x: "Medal Won" if pd.notna(x) else "No Medal")
+    df["Medal"] = df["Medal"].fillna("No Medal")
+
+    participation_counts = df.groupby(["Participation_Number", "Medal_Status"]).size().unstack(fill_value=0)
+    participation_counts = participation_counts.reset_index()
+    participation_counts_detailed = df.groupby(["Sport", "Participation_Number", "Medal"]).size().unstack(fill_value=0)
+    participation_counts_detailed = participation_counts_detailed[["Gold", "Silver", "Bronze", "No Medal"]].reset_index()
+    
+    # sport_selected_medals = participation_counts_detailed[participation_counts_detailed['Sport'] == sport]
+    sport_selected_medals = participation_counts_detailed
+
+    sport_selected_medals['Gold_Percentage'] = (sport_selected_medals['Gold'] / (sport_selected_medals['Gold'] + sport_selected_medals['Silver'] + sport_selected_medals['Bronze'] + sport_selected_medals['No Medal'])) * 100
+    sport_selected_medals['Silver_Percentage'] = (sport_selected_medals['Silver'] / (sport_selected_medals['Gold'] + sport_selected_medals['Silver'] + sport_selected_medals['Bronze'] + sport_selected_medals['No Medal'])) * 100
+    sport_selected_medals['Bronze_Percentage'] = (sport_selected_medals['Bronze'] / (sport_selected_medals['Gold'] + sport_selected_medals['Silver'] + sport_selected_medals['Bronze'] + sport_selected_medals['No Medal'])) * 100
+    
+    df = sport_selected_medals[sport_selected_medals['Participation_Number'] <= 4] 
+    
+    return df

@@ -240,6 +240,20 @@ def main():
 
     else:
         st.info("Please select a discipline to view participation span.")
+        
+    # ===========================
+    # Visualization 9
+    # Q12: Combien de fois pourrais-je participer aux Jeux Olympiques tout au long de ma carrière ?
+    # ===========================  
+    st.subheader("Visualisation 9: Olympic Hall of Fame")
+    
+    if discipline != "None":
+        medal_counts = preprocess.preprocess_stacked_bar_chart(olympics_data, discipline)    
+        fig9 = stacked_bar_chart.stacked_bar_chart_9(medal_counts)
+        st.plotly_chart(fig9)
+
+    else:
+        st.info("Please select a discipline to view the top athletes.")
 
 if __name__ == "__main__":
     main()

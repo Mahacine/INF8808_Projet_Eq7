@@ -60,3 +60,32 @@ def visualize_data(data, sport):
     fig.update_xaxes(tickangle=-90)
 
     return fig
+
+def stacked_bar_chart_9(medal_counts):
+    
+    top_athletes = medal_counts.groupby("Name")["Count"].sum().nlargest(10)
+    medal_counts = medal_counts[medal_counts["Name"].isin(top_athletes.index)]
+    medal_colors = {"Gold": "#FFD700", "Silver": "#C0C0C0", "Bronze": "#CD7F32"}
+
+    ordered_athletes = top_athletes.index[::-1]
+    
+    fig = px.bar(
+        medal_counts,
+        x="Count",
+        y="Name",
+        color="Medal",
+        orientation="h",
+        title="Olympic Hall of Fame",
+        labels={"Count": "Total Medals", "Name": "Athletes"},
+        color_discrete_map=medal_colors,
+        category_orders={"Name": ordered_athletes}
+    )
+
+    fig.update_layout(
+        template="plotly_white",
+        xaxis_title="Total Medals",
+        yaxis_title="",
+        showlegend=True
+    )
+    
+    return fig

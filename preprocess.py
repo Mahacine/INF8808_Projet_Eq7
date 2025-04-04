@@ -256,3 +256,13 @@ def preprocess_connected_dot_plot_data(olympics_data, sport):
         value_name='Age (Years)'
     )
     return age_stats, age_stats_long   
+
+def preprocess_stacked_bar_chart(olympics_data, sport):
+    
+    df = olympics_data[olympics_data["Sport"] == sport]
+    
+    df["Medal"] = df["Medal"].fillna("No Medal")
+
+    medal_counts = df[df["Medal"] != "No Medal"].groupby(["Name", "Medal"]).size().reset_index(name="Count")
+    
+    return medal_counts

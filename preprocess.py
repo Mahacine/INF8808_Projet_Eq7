@@ -166,7 +166,7 @@ def preprocess_sankey_data(olympics_data, year, sport, country, top_k=3):
     df_medals['Medal_NOC'] = df_medals['Medal'] + '_' + df_medals['NOC']
 
     # Count the number of medals for each country, for each type of medals
-    medal_counts = df_medals.groupby(['NOC', 'Medal_NOC']).size().reset_index(name='Count')
+    medal_counts = df_medals.groupby(['NOC', 'Region', 'Medal_NOC']).size().reset_index(name='Count')
 
     total_counts_per_country = df_medals.groupby('NOC').size()  # Total participations per country
     print(total_counts_per_country)

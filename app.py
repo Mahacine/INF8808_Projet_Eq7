@@ -92,7 +92,7 @@ def main():
 
             grouped, size_column = preprocess.compute_relative_size_column(grouped, mode)
             fig1 = scatter_charts.create_age_distribution_bubble(data_plot, grouped, size_column, show_avg, mode)
-            st.plotly_chart(fig1)
+            st.plotly_chart(fig1, key="fig1")
     else:
         st.info("Please select a discipline to view the age distribution and average age over time.")
 
@@ -120,7 +120,7 @@ def main():
             mode_event = st.radio("Select mode (Event)", ("Absolute", "Relative"), key="mode_event")
             grouped_event, size_col_event = preprocess.compute_relative_size_column(grouped_event, mode_event)
             fig2 = scatter_charts.create_event_age_scatter(grouped_event, size_col_event)
-            st.plotly_chart(fig2)
+            st.plotly_chart(fig2, key="fig2")
 
     else:
         st.info("Please select a discipline to view sub-category analysis.")
@@ -140,7 +140,7 @@ def main():
             st.info("No medal data available for the selected sport.")
         else:
             fig3 = bubble_chart.create_medal_age_bubble(medal_by_age_distribution)
-            st.plotly_chart(fig3)
+            st.plotly_chart(fig3, key="fig3")
     else:
         st.info("Please select a discipline to view medal analysis.")
 
@@ -174,7 +174,7 @@ def main():
         else:
             if not is_country_data_available:            
                 st.info("No data available for the selected country. However, here are the top 3 countries:")
-            st.plotly_chart(fig4)
+            st.plotly_chart(fig4, key="fig4")
     else:
         st.info("Please select a country and a discipline to view performance analysis.")
 
@@ -194,7 +194,7 @@ def main():
                 st.error("There is no available data for selected discipline.")
             else:
                 fig5 = connected_dot_plot.connected_dot_plot(event_counts, discipline)
-                st.plotly_chart(fig5, use_container_width=True)
+                st.plotly_chart(fig5, use_container_width=True, key="fig5")
     else:
         st.info("Please select a discipline to view gender disparities.")
 
@@ -212,7 +212,7 @@ def main():
 
         processed_data = preprocess.preprocess_gender_by_year(olympics_data, discipline)    
         fig6 = stacked_bar_chart.visualize_data(processed_data, discipline)
-        st.plotly_chart(fig6)
+        st.plotly_chart(fig6, key="fig6")
 
     else:
         st.info("Please select a discipline to view gender disparities.")
@@ -231,7 +231,7 @@ def main():
     if discipline != "None":
         data = preprocess.preprocess_bar_chart_data(olympics_data, discipline)    
         fig7 = bar_chart.visualize_data(data, discipline)
-        st.plotly_chart(fig7)
+        st.plotly_chart(fig7, key="fig7")
 
     else:
         st.info("Please select a discipline to view the odds of winning a medal.")
@@ -245,7 +245,7 @@ def main():
     if discipline != "None":
         age_stats, age_stats_long = preprocess.preprocess_connected_dot_plot_data(olympics_data, discipline)    
         fig8 = connected_dot_plot.connected_dot_plot_8(age_stats, age_stats_long, discipline)
-        st.plotly_chart(fig8)
+        st.plotly_chart(fig8, key="fig8")
 
     else:
         st.info("Please select a discipline to view participation span.")
@@ -259,7 +259,7 @@ def main():
     if discipline != "None":
         medal_counts = preprocess.preprocess_stacked_bar_chart(olympics_data, discipline)    
         fig9 = stacked_bar_chart.stacked_bar_chart_9(medal_counts)
-        st.plotly_chart(fig9)
+        st.plotly_chart(fig9, key="fig9")
 
     else:
         st.info("Please select a discipline to view the top athletes.")

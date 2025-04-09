@@ -114,16 +114,36 @@ def create_age_distribution_bubble(data, grouped, size_column, show_avg=False, m
     '''
     if grouped.empty:
         return go.Figure().update_layout(title="No data available for the selected filters.")
-
-    fig = make_subplots(specs=[[{"secondary_y": True}]]) if show_avg else go.Figure()
-    fig = add_age_distribution_trace(fig, grouped, size_column, mode, show_avg)
-    if show_avg:
-        fig = add_avg_age_trace(fig, data)
-    fig = format_age_yaxes(fig, show_avg)
-    fig.update_layout(
-        xaxis_title="Year",
-        legend_title="Legend"
+    
+    fig = px.scatter(
+        grouped,
+        x="Year",
+        y="Age_Midpoint",
+        size=size_column,
+        color="Age Group",
+        labels={"Year": "Year", "Age Group": "Age Group", size_column: "Count" if mode == "Absolute" else "Percentage"},
+        opacity=0.85,
+        size_max=40
     )
+    
+    fig.update_yaxes(
+        tickvals=list(AGE_MIDPOINTS.values()),
+        ticktext=list(AGE_MIDPOINTS.keys()),
+        title="Age Group (Midpoint)"
+    )
+
+    if show_avg:
+        avg_age = data.groupby("Year")["Age"].mean().reset_index(name="Average Age")
+        fig.add_trace(
+            go.Scatter(
+                x=avg_age["Year"],
+                y=avg_age["Average Age"],
+                mode="lines+markers",
+                name="Average Age",
+                line=dict(color="red")
+            )
+        )
+
     return fig
 
 

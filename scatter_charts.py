@@ -6,8 +6,9 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import hover_template as hover
+import pandas as pd
 
-from preprocess import AGE_MIDPOINTS
+from preprocess import AGE_MIDPOINTS, AGE_BINS, AGE_LABELS
 
 def add_age_distribution_trace(fig, grouped, size_column, mode="Absolute", show_avg=False):
     '''
@@ -35,7 +36,7 @@ def add_age_distribution_trace(fig, grouped, size_column, mode="Absolute", show_
                 sizemin=4,
                 color=grouped["Age_Midpoint"],
                 colorscale="Viridis",
-                showscale=True,
+                showscale=False,
             ),
             name="Age Group",
             hovertemplate=hover.age_distribution_hover(mode),
@@ -56,17 +57,22 @@ def add_avg_age_trace(fig, data):
         Returns:
             The updated figure with the average age line trace
     '''
-    avg_age = data.groupby("Year")["Age"].mean().reset_index(name="Average Age")
-    fig.add_trace(
-        go.Scatter(
-            x=avg_age["Year"],
-            y=avg_age["Average Age"],
-            mode="lines+markers",
-            name="Average Age",
-            line=dict(color="red"),
-        ),
-        secondary_y=True
+    avg_age = data.groupby("Year")["Age"].mean().reset_index()
+    avg_age["Age Group"] = pd.cut(
+        avg_age["Age"], bins=AGE_BINS, labels=AGE_LABELS, right=False
     )
+    avg_age["Age_Midpoint"] = avg_age["Age Group"].map(AGE_MIDPOINTS)
+    
+    scatter_trace = go.Scatter(
+        x=avg_age["Year"],
+        y=avg_age["Age_Midpoint"],
+        mode="lines+markers",
+        name="Average Age",
+        line=dict(color="red"),
+    )
+
+    fig.add_trace(scatter_trace)
+    
     return fig
 
 
@@ -84,7 +90,8 @@ def format_age_yaxes(fig, show_avg=False):
     if show_avg:
         fig.update_yaxes(title_text="Age Group (Midpoint)", secondary_y=False,
                          tickvals=list(AGE_MIDPOINTS.values()), ticktext=list(AGE_MIDPOINTS.keys()))
-        fig.update_yaxes(title_text="Average Age", secondary_y=True)
+        fig.update_yaxes(title_text="Average Age", secondary_y=True,
+                         tickvals=list(AGE_MIDPOINTS.values()), ticktext=list(AGE_MIDPOINTS.keys()))
     else:
         fig.update_yaxes(title_text="Age Group (Midpoint)",
                          tickvals=list(AGE_MIDPOINTS.values()), ticktext=list(AGE_MIDPOINTS.keys()))

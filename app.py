@@ -88,7 +88,6 @@ def main():
             grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
 
             grouped, size_column = preprocess.compute_relative_size_column(grouped, mode)
-
             fig1 = scatter_charts.create_age_distribution_bubble(data_plot, grouped, size_column, show_avg, mode)
             st.plotly_chart(fig1)
     else:

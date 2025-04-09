@@ -53,15 +53,13 @@ def main():
     # ---------------------------
     # Data Filtering
     # ---------------------------
-    if discipline != "None" and user_country != "None":
-        filtered_data = olympics_data[(olympics_data["Sport"] == discipline) & 
-                                      (olympics_data["NOC"] == user_country)]
-    elif discipline != "None":
-        filtered_data = olympics_data[olympics_data["Sport"] == discipline]
-    elif user_country != "None":
-        filtered_data = olympics_data[olympics_data["NOC"] == user_country]
-    else:
-        filtered_data = olympics_data
+    # if discipline != "None" and user_country != "None":
+    #     filtered_data = olympics_data[(olympics_data["Sport"] == discipline) & 
+    #                                   (olympics_data["NOC"] == user_country)]
+    if discipline != "None":
+        filtered_discipline_data = olympics_data[olympics_data["Sport"] == discipline]
+    if user_country != "None":
+        filtered_country_data = olympics_data[olympics_data["NOC"] == user_country]
 
     # Header
     st.title("Welcome to our Olympics Data Exploration and Visualization App")
@@ -82,7 +80,7 @@ def main():
         show_avg = st.checkbox("Show Average Age", key="show_avg_age")
 
         # Prepare data for visualization 1
-        data_plot = preprocess.add_age_group(filtered_data)
+        data_plot = preprocess.add_age_group(filtered_discipline_data)
         if data_plot.empty:
             st.info("No data available for the selected filters and age.")
         else:
@@ -102,10 +100,10 @@ def main():
     # ===========================
     st.subheader("Visualisation 2: Comment l'âge des athlètes évolue-t-il selon les sous-catégories de ma discipline ?")
     if discipline != "None":
-        events = filtered_data["Event"].unique().tolist()
+        events = filtered_discipline_data["Event"].unique().tolist()
         event_selected = st.selectbox("Select a sub-category (Event)", ["All"] + events, key="event_select")
         
-        data_event = filtered_data.copy()
+        data_event = filtered_discipline_data.copy()
         if event_selected != "All":
             data_event = data_event[data_event["Event"] == event_selected]
         

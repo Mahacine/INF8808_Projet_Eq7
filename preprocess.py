@@ -33,6 +33,16 @@ def normalize_countries(olympics_df, regions_df):
     return olympics_df
 
 
+def get_noc_from_country(region_name, regions_df):
+    '''
+    Returns the NOC code from the country name (Region).
+    '''
+    if region_name == "None":
+        return None
+    row = regions_df[regions_df["Region"] == region_name]
+    return row["NOC"].values[0] if not row.empty else None
+
+
 def add_age_group(df):
     '''
         Adds age group and midpoint columns to the dataframe based on predefined bins.

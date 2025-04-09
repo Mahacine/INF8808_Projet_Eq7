@@ -80,7 +80,6 @@ def create_age_distribution_bubble(data, grouped, size_column, show_avg=False, m
         fig = add_avg_age_trace(fig, data)
     fig = format_age_yaxes(fig, show_avg)
     fig.update_layout(
-        title="Evolution of Age Distribution and Average Age Over Time",
         xaxis_title="Year",
         legend_title="Legend"
     )

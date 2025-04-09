@@ -44,7 +44,9 @@ def main():
     st.sidebar.title("Please provide the following details : ")
     user_sex = st.sidebar.selectbox("Select your sex", ["Male", "Female"])
     discipline = st.sidebar.selectbox("Select a discipline", ["None"] + [sport.value for sport in sport.Sport])
-    user_country = st.sidebar.selectbox("Select your country", ["None"] + olympics_data["NOC"].unique().tolist())
+    country_options = ["None"] + sorted(olympics_data["Region"].dropna().unique().tolist())
+    user_country_name = st.sidebar.selectbox("Select your country", country_options)
+    user_country = preprocess.get_noc_from_country(user_country_name, regions_data)
     user_age = st.sidebar.text_input("Enter your age (0-99)")
     st.sidebar.markdown("---")
     st.sidebar.markdown("[![GitHub](https://img.icons8.com/ios-glyphs/30/ffffff/github.png)](https://github.com/Mahacine/INF8808_Projet_Eq7) Developed by Team 7 : ")
@@ -94,22 +96,26 @@ def main():
     # Q2: Quelle est la répartition de chaque catégorie d'âge ?
     # ===========================
     st.subheader("Visualization 1: Quel est l'âge moyen des athlètes dans ma discipline et comment a-t-il évolué au fil du temps et quelle est la répartition de chaque catégorie d'âge ?")
-    # Interactive controls: absolute vs relative and option to overlay average age
-    mode = st.radio("Select mode for bubble size", ("Absolute", "Relative"), key="mode_age_distribution")
-    show_avg = st.checkbox("Show Average Age", key="show_avg_age")
+        
+    if discipline != "None":
+        # Interactive controls: absolute vs relative and option to overlay average age
+        mode = st.radio("Select mode for bubble size", ("Absolute", "Relative"), key="mode_age_distribution")
+        show_avg = st.checkbox("Show Average Age", key="show_avg_age")
 
-    # Prepare data for visualization 1
-    data_plot = preprocess.add_age_group(filtered_data)
-    if data_plot.empty:
-        st.info("No data available for the selected filters and age.")
+        # Prepare data for visualization 1
+        data_plot = preprocess.add_age_group(filtered_data)
+        if data_plot.empty:
+            st.info("No data available for the selected filters and age.")
+        else:
+            grouped = data_plot.groupby(["Year", "Age Group"]).size().reset_index(name="Count")
+            grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
+
+            grouped, size_column = preprocess.compute_relative_size_column(grouped, mode)
+
+            fig1 = scatter_charts.create_age_distribution_bubble(data_plot, grouped, size_column, show_avg, mode)
+            st.plotly_chart(fig1)
     else:
-        grouped = data_plot.groupby(["Year", "Age Group"]).size().reset_index(name="Count")
-        grouped["Age_Midpoint"] = grouped["Age Group"].map(AGE_MIDPOINTS)
-
-        grouped, size_column = preprocess.compute_relative_size_column(grouped, mode)
-
-        fig1 = scatter_charts.create_age_distribution_bubble(data_plot, grouped, size_column, show_avg, mode)
-        st.plotly_chart(fig1)
+        st.info("Please select a discipline to view the age distribution and average age over time.")
 
     # ===========================
     # Visualization 2

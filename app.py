@@ -183,7 +183,7 @@ def main():
     # Q8: Pour ma discipline, existe-t-il des disparités entre hommes et femmes ?
     # ===========================
     if discipline != "None":
-        st.subheader(f"Disparities between men and women in my {discipline} :")
+        st.subheader(f"Disparities between men and women in {discipline} :")
     else :
         st.subheader("Disparities between men and women in my discipline :")
 

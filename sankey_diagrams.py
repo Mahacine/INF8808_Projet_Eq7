@@ -133,7 +133,7 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
     else :
       plot_type = 'Percentage'
     fig.update_layout(
-        title_text=f'Medal distribution in {sport} by {plot_type} (Edition : {year})',
+        title_text=f'Edition : {year}',
         font_size=12
     )
     

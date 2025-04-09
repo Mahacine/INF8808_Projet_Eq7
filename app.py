@@ -178,10 +178,12 @@ def main():
         <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:#CD7F32;border:1px solid black;"></span> Bronze<br>
         <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:white;border:1px solid black;"></span> No Medal
          """, unsafe_allow_html=True)
-        fig4 = sankey_diagrams.create_sankey_plot(olympics_data, participation_year, discipline, user_country, is_relative)
+        fig4, is_country_data_available = sankey_diagrams.create_sankey_plot(olympics_data, participation_year, discipline, user_country, is_relative)
         if fig4 is None:
             st.info("No data available for the selected filters.")
         else:
+            if not is_country_data_available:            
+                st.info("No data available for the selected country. However, here are the top 3 countries:")
             st.plotly_chart(fig4)
     else:
         st.info("Please select a country and a discipline to view performance analysis.")

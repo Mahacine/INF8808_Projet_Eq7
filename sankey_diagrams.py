@@ -10,7 +10,7 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
     df_medals, medal_counts = preprocess_sankey_data(olympics_data, year, sport, selected_country)
     
     if df_medals is None:
-      return None
+      return None, None
 
     # List of nodes for Sankey
     countries = medal_counts['NOC'].unique().tolist()
@@ -97,6 +97,7 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
     link_colors = []
     for idx,color in enumerate(node_colors[len(countries):]):
        # if values[idx] != 0:
+       # Reference : https://www.30secondsofcode.org/python/s/hex-to-rgb/
        rgb = tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
        link_colors.append(f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, 0.7)")
     
@@ -135,6 +136,10 @@ def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative
         title_text=f'Medal distribution in {sport} by {plot_type} (Edition : {year})',
         font_size=12
     )
+    
+    is_country_data_available = False
+    if selected_country in countries:
+      is_country_data_available = True
 
     # return fig , source_indices, target_indices, values
-    return fig
+    return fig, is_country_data_available

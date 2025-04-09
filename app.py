@@ -211,7 +211,7 @@ def main():
 
     if discipline != "None":
 
-        processed_data = preprocess.preprocess_data(olympics_data, discipline)    
+        processed_data = preprocess.preprocess_gender_by_year(olympics_data, discipline)    
         fig6 = stacked_bar_chart.visualize_data(processed_data, discipline)
         st.plotly_chart(fig6)
 

@@ -47,6 +47,7 @@ def main():
     country_options = ["None"] + sorted(olympics_data["Region"].dropna().unique().tolist())
     user_country_name = st.sidebar.selectbox("Select your country", country_options)
     user_country = preprocess.get_noc_from_country(user_country_name, regions_data)
+    # print('Country:',type(user_country))
     user_age = st.sidebar.text_input("Enter your age (0-99)")
     st.sidebar.markdown("---")
     st.sidebar.markdown("[![GitHub](https://img.icons8.com/ios-glyphs/30/ffffff/github.png)](https://github.com/Mahacine/INF8808_Projet_Eq7) Developed by Team 7 : ")

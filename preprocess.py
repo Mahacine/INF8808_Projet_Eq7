@@ -67,9 +67,9 @@ def get_noc_from_country(region_name, regions_df):
             The matching NOC code, or None if not found
     '''
     if region_name == "None":
-        return None
+        return "None"
     row = regions_df[regions_df["Region"] == region_name]
-    return row["NOC"].values[0] if not row.empty else None
+    return row["NOC"].values[0] if not row.empty else "None"
 
 
 def add_age_group(df):

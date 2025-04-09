@@ -72,7 +72,10 @@ def main():
     # Q1: Quel est l'âge moyen des athlètes dans ma discipline et comment a-t-il évolué au fil du temps ?
     # Q2: Quelle est la répartition de chaque catégorie d'âge ?
     # ===========================
-    st.subheader("Visualization 1: Quel est l'âge moyen des athlètes dans ma discipline et comment a-t-il évolué au fil du temps et quelle est la répartition de chaque catégorie d'âge ?")
+    if discipline != "None":
+        st.subheader(f"Age group distribution and average age of athletes in {discipline}:")
+    else:
+        st.subheader("Age group distribution and average age of athletes in my discipline :")
         
     if discipline != "None":
         # Interactive controls: absolute vs relative and option to overlay average age
@@ -97,7 +100,11 @@ def main():
     # Visualization 2
     # Q4: Comment l'âge des athlètes évolue-t-il selon les sous-catégories de ma discipline ?
     # ===========================
-    st.subheader("Visualisation 2: Comment l'âge des athlètes évolue-t-il selon les sous-catégories de ma discipline ?")
+    if discipline != "None":
+        st.subheader(f"Age evolution of athletes across subcategories in {discipline} :")
+    else:
+        st.subheader("Age evolution of athletes across subcategories in my discipline :")
+        
     if discipline != "None":
         events = filtered_discipline_data["Event"].unique().tolist()
         event_selected = st.selectbox("Select a sub-category (Event)", ["All"] + events, key="event_select")
@@ -122,7 +129,11 @@ def main():
     # Visualization 3
     # Q3: Existe-t-il une tranche d'âge optimale pour remporter une médaille dans ma discipline ?
     # ===========================
-    st.subheader("Visualisation 3: Existe-t-il une tranche d'âge optimale pour remporter une médaille dans ma discipline ?")
+    if discipline != "None":
+        st.subheader(f"Optimal age range for winning a medal in {discipline} :")
+    else:
+        st.subheader("Optimal age range for winning a medal in my discipline :")
+    
     if discipline != "None":
         medal_by_age_distribution = preprocess.group_by_medal_and_age_group(olympics_data[olympics_data["Sport"] == discipline])
         if medal_by_age_distribution.empty:
@@ -137,7 +148,11 @@ def main():
     # Visualization 4
     # Q5, Q6 & Q7: Analyse de la performance et de la participation par pays via un diagramme Sankey
     # ===========================
-    st.subheader("Visualisation 4: Comment mon pays a-t-il performé historiquement et comparativement aux pays de référence ?")
+    if user_country != "None" and discipline != "None":
+        st.subheader(f"Historical performance of {user_country_name} in {discipline} vs. key reference countries :")
+    else:
+        st.subheader("Historical performance of my country vs. key reference countries :")
+        
     if user_country != "None" and discipline != "None":
         participation_year = st.selectbox("Select a year", ["All Editions"] + sorted([year for year in olympics_data["Year"].unique() if year >= 1999], reverse=True))
         performance_mode_event = st.radio("Select a mode", ("Absolute", "Relative"), key="performance_mode_event")
@@ -167,7 +182,10 @@ def main():
     # Visualization 5
     # Q8: Pour ma discipline, existe-t-il des disparités entre hommes et femmes ?
     # ===========================
-    st.subheader("Visualisation 5: Pour ma discipline, existe-t-il des disparités entre hommes et femmes ?")
+    if discipline != "None":
+        st.subheader(f"Disparities between men and women in my {discipline} :")
+    else :
+        st.subheader("Disparities between men and women in my discipline :")
 
     if discipline != "None":
             event_counts = preprocess.dot_plot_preprocess(olympics_data, discipline)
@@ -185,7 +203,10 @@ def main():
     # Visualization 6
     # Q9 & Q10: Évolution de la répartition hommes-femmes et participation féminine dans le temps
     # ===========================
-    st.subheader("Visualisation 6: Evolution of Gender Participation Over Time")
+    if discipline != "None":
+        st.subheader(f"Evolution of gender participation in {discipline} :")
+    else :
+        st.subheader("Evolution of gender participation in my discipline :")
 
     if discipline != "None":
 
@@ -201,7 +222,11 @@ def main():
     # Q11: Combien de participations un athlète dans ma discipline a-t-il généralement avant de remporter une médaille ?
     # ===========================
     # Visualization: Number of Medals Over Time
-    st.subheader("Visualisation 7: Odds of Winning a Medal Based on Number of Olympic Participations")
+    
+    if discipline != "None":
+        st.subheader(f"Odds of winning a medal in {discipline} based on number of Olympic participations :")
+    else :
+        st.subheader("Odds of winning a medal in my discipline based on number of Olympic participations :")
     
     if discipline != "None":
         data = preprocess.preprocess_bar_chart_data(olympics_data, discipline)    
@@ -215,7 +240,7 @@ def main():
     # Visualization 8
     # Q12: Combien de fois pourrais-je participer aux Jeux Olympiques tout au long de ma carrière ?
     # ===========================
-    st.subheader("Visualisation 8: Career Participation Span Across Sports")
+    st.subheader("Career participation span across sports :")
     
     if discipline != "None":
         age_stats, age_stats_long = preprocess.preprocess_connected_dot_plot_data(olympics_data, discipline)    
@@ -229,7 +254,7 @@ def main():
     # Visualization 9
     # Q12: Combien de fois pourrais-je participer aux Jeux Olympiques tout au long de ma carrière ?
     # ===========================  
-    st.subheader("Visualisation 9: Olympic Hall of Fame")
+    st.subheader("Olympic Hall of Fame :")
     
     if discipline != "None":
         medal_counts = preprocess.preprocess_stacked_bar_chart(olympics_data, discipline)    

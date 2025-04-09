@@ -14,27 +14,25 @@ import stacked_bar_chart
 import bar_chart
 from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
-def prep_data(olympics_dataframe, regions_dataframe):
+@st.cache_data
+def prep_data():
     '''
         Imports the .csv file and does some preprocessing.
 
         Returns:
             A pandas dataframe containing the preprocessed data.
     '''
-    
-    olympics_dataframe = preprocess.convert_age(olympics_dataframe)
+    olympics_data_unprocessed = pd.read_csv('./assets/data/all_athlete_games.csv')
+    regions_data = pd.read_csv('./assets/data/all_regions.csv')
+    olympics_dataframe = preprocess.convert_age(olympics_data_unprocessed)
     olympics_dataframe = preprocess.normalize_events(olympics_dataframe)
-    olympics_dataframe = preprocess.normalize_countries(olympics_dataframe, regions_dataframe)
+    olympics_dataframe = preprocess.normalize_countries(olympics_dataframe, regions_data)
     
-    return olympics_dataframe
+    return olympics_dataframe, regions_data
 
 # Load the data
-olympics_data_unprocessed = pd.read_csv('./assets/data/all_athlete_games.csv')
-regions_data = pd.read_csv('./assets/data/all_regions.csv')
-
 header_image_path = './assets/images/header_image.png'
-
-olympics_data = prep_data(olympics_data_unprocessed, regions_data)
+olympics_data, regions_data = prep_data()
 
 def main():
     # ---------------------------

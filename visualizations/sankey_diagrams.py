@@ -1,8 +1,8 @@
-from preprocess import preprocess_sankey_data
+from preprocess.preprocess import preprocess_sankey_data
 import plotly.graph_objects as go
 
-from theme import GOLD, SILVER, BRONZE, NO_MEDAL
-import hover_template
+from style.theme import GOLD, SILVER, BRONZE, NO_MEDAL
+import style.hover_template as hover_template
 
 # Function to create the Sankey plot for a given year or for all editions
 def create_sankey_plot(olympics_data, year, sport, selected_country, is_relative = False):

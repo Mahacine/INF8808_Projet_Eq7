@@ -4,15 +4,15 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-import preprocess
-import sport
-import scatter_charts
-import sankey_diagrams
-import bubble_chart
-import connected_dot_plot
-import stacked_bar_chart
-import bar_chart
-from preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
+import preprocess.preprocess as preprocess
+import preprocess.sport as sport
+import visualizations.scatter_charts as scatter_charts
+import visualizations.sankey_diagrams as sankey_diagrams
+import visualizations.bubble_chart as bubble_chart
+import visualizations.connected_dot_plot as connected_dot_plot
+import visualizations.stacked_bar_chart as stacked_bar_chart
+import visualizations.bar_chart as bar_chart
+from preprocess.preprocess import AGE_MIDPOINTS, AGE_LABELS, AGE_BINS
 
 @st.cache_data
 def prep_data():

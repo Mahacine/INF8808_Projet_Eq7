@@ -1,9 +1,9 @@
 import plotly.graph_objects as go
 import plotly.express as px
-import hover_template as hover
+import style.hover_template as hover
 
-from preprocess import AGE_MIDPOINTS
-from theme import GOLD, SILVER, BRONZE
+from preprocess.preprocess import AGE_MIDPOINTS
+from style.theme import GOLD, SILVER, BRONZE
 
 medal_colors = {"Gold": GOLD, "Silver": SILVER, "Bronze": BRONZE}
 

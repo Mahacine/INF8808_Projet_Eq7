@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
-import sport as sp
-from theme import MALE, FEMALE
+import preprocess.sport as sp
+from style.theme import MALE, FEMALE
 
 def connected_dot_plot(event_counts, discipline):
     both_genders = event_counts[(event_counts["Men's"] > 0) & (event_counts["Women's"] > 0)]

@@ -1,5 +1,5 @@
 import plotly.express as px
-from theme import MALE, FEMALE
+from style.theme import MALE, FEMALE
 
 def visualize_data(data, sport):
     fig = px.bar(

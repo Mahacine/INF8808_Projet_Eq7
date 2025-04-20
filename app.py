@@ -228,7 +228,7 @@ def main():
     
     if discipline != "None":
         data = preprocess.preprocess_bar_chart_data(olympics_data, discipline)    
-        fig7 = bar_chart.visualize_data(data, discipline)
+        fig7 = bar_chart.visualize_data(data)
         st.plotly_chart(fig7, key="fig7")
 
     else:

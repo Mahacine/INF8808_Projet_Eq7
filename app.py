@@ -191,7 +191,7 @@ def main():
             if "Men's" not in event_counts.columns or "Women's" not in event_counts.columns:
                 st.error("There is no available data for selected discipline.")
             else:
-                fig5 = connected_dot_plot.connected_dot_plot(event_counts, discipline)
+                fig5 = connected_dot_plot.connected_dot_plot(event_counts)
                 st.plotly_chart(fig5, use_container_width=True, key="fig5")
     else:
         st.info("Please select a discipline to view gender disparities.")

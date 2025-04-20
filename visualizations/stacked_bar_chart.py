@@ -13,15 +13,24 @@ def visualize_data(data, sport):
 
     fig.update_layout(
         barmode="relative",
+        legend_title=dict(
+            text="Gender",
+            font=dict(size=14)
+        ),
         xaxis=dict(
             type="category",
             tickmode="array",
             tickvals=data["Year"],
             ticktext=data["Year"],
+            tickfont=dict(size=14),         
         ),
-        yaxis=dict(title="percentage of participation"),
-        plot_bgcolor="white"
+        yaxis=dict(
+            title="Percentage of Participation",
+            tickfont=dict(size=14)          
+        ),
+        plot_bgcolor="#f0f0f0",
     )
+
 
     fig.add_hline(y=50, line_dash="dash", line_color="black", annotation_text="50%",
                   annotation_position="right", annotation_font_size=14, annotation_font_color="black")

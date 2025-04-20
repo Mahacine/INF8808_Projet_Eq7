@@ -40,15 +40,24 @@ def connected_dot_plot(event_counts, discipline):
         yaxis_categoryorder="total ascending",
         xaxis_title="Number of Participants",
         yaxis_title="Category",
-        legend_title="Gender",
-        plot_bgcolor="white",
+        legend_title=dict(
+            text="Gender",
+            font=dict(size=14)
+        ),
+        plot_bgcolor="#f0f0f0",
         paper_bgcolor="white",
         font=dict(size=14),
+        xaxis=dict(
+            tickfont=dict(size=13)
+        ),
         yaxis=dict(
+            tickfont=dict(size=13),
             tickmode="array",
             tickvals=event_counts_melted["Clean_Event"].unique(),
         )
+
     )
+    fig5.update_traces(marker=dict(size=10))
 
     return fig5
 
